@@ -1,0 +1,17 @@
+[
+  {
+    "text": "Thrust shall be >= 500 N at rated operating conditions",
+    "criticality": "High",
+    "decision_class_required": "ReleaseCritical"
+  },
+  {
+    "text": "Tip displacement shall not exceed 2 mm under maximum thrust load",
+    "criticality": "High",
+    "decision_class_required": "DesignGate"
+  },
+  {
+    "text": "Fan blade mass shall not exceed 0.8 kg",
+    "criticality": "Medium",
+    "decision_class_required": "DesignGate"
+  }
+]

@@ -1,0 +1,23 @@
+[
+  {
+    "name": "thrust_output",
+    "quantity_kind": "Force",
+    "unit": "N",
+    "criticality": "High",
+    "decision_class_required": "ReleaseCritical"
+  },
+  {
+    "name": "tip_displacement",
+    "quantity_kind": "Length",
+    "unit": "mm",
+    "criticality": "High",
+    "decision_class_required": "DesignGate"
+  },
+  {
+    "name": "blade_mass",
+    "quantity_kind": "Mass",
+    "unit": "kg",
+    "criticality": "Medium",
+    "decision_class_required": "DesignGate"
+  }
+]

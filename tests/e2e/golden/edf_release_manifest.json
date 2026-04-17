@@ -1,0 +1,6 @@
+{
+  "manifest_status": "draft",
+  "assembly_revision_id": "__assembly_revision_id_placeholder__",
+  "all_rules_passed": false,
+  "_note": "Partial pass expected: only 3 of 10 characteristics present and not all have inspection_confirmed status. manifest_id is non-empty and manifest_status must be 'draft'."
+}
