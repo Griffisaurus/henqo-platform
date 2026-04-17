@@ -1,0 +1,142 @@
+syntax = "proto3";
+package henqo.schema.v1;
+import "primitives.proto";
+
+// ProvenanceBundle
+message ProvenanceBundle {
+  string bundle_id = 1;
+  string activity = 2;           // e.g., "surrogate_inference", "cfd_run", "model_promotion"
+  string agent_id = 3;
+  repeated string entity_ids_created = 4;
+  repeated string entity_ids_modified = 5;
+  string derived_from_bundle_id = 6;
+  repeated ProvenanceApproval approvals = 7;
+  string created_at = 8;
+}
+
+message ProvenanceApproval {
+  string approver_id = 1;
+  string approver_role = 2;
+  string activity = 3;           // what was approved
+  string signature = 4;          // base64 encoded signature or approval token
+  string approved_at = 5;
+}
+
+// ReleaseManifest
+message ReleaseManifest {
+  string manifest_id = 1;
+  string assembly_revision_id = 2;
+  string release_version = 3;
+  string program_id = 4;
+  string manifest_status = 5;    // draft | pending_signatures | active | superseded
+  int32 target_mrl = 6;
+  repeated ArtifactInventoryItem artifacts_inventory = 7;
+  EvidenceCompleteness evidence_completeness = 8;
+  float requirement_coverage_fraction = 9;
+  float inspection_coverage_score = 10;
+  float manufacturability_score = 11;
+  repeated ManifestSignatory signatories = 12;
+  string manifest_digest = 13;   // SHA-256; null until all signatures received
+  repeated string active_waiver_ids = 14;
+  string created_at = 15;
+  string provenance_bundle_id = 16;
+}
+
+message ArtifactInventoryItem {
+  string artifact_type = 14;
+  string description = 2;
+  string storage_uri = 3;
+  string digest = 4;             // SHA-256
+  string revision_id = 5;
+}
+
+message EvidenceCompleteness {
+  bool rule_01 = 1;
+  bool rule_02 = 2;
+  bool rule_03 = 3;
+  bool rule_04 = 4;
+  bool rule_05 = 5;
+  bool rule_06 = 6;
+  bool rule_07 = 7;
+  bool rule_08 = 8;
+  bool rule_09 = 9;
+  bool rule_10 = 10;
+  repeated string failed_rule_details = 11;
+}
+
+message ManifestSignatory {
+  string role = 1;
+  string agent_id = 2;
+  string signed_at = 3;
+  string signature = 4;
+  string status = 5;             // "awaiting" | "signed"
+}
+
+// DecisionPackage
+message DecisionPackage {
+  string package_id = 1;
+  string package_name = 2;
+  string assembly_revision_id = 3;
+  string review_gate = 4;        // "PDR" | "CDR" | "TRR"
+  int32 target_mrl = 5;
+  repeated EvidenceItem evidence_items = 6;
+  bool evidence_completeness_check = 7;
+  string status = 8;             // "draft" | "submitted" | "approved" | "rejected"
+  string requested_action = 9;
+  string created_at = 10;
+  string provenance_bundle_id = 11;
+}
+
+message EvidenceItem {
+  string requirement_id = 1;
+  string characteristic_id = 2;
+  string evidence_type = 3;      // "Prediction" | "SimulationCase" | "InspectionResult"
+  string evidence_entity_id = 4;
+  string status = 5;             // "provisionally_supportive" | "definitively_supportive" | "insufficient"
+  string decision_class_achieved = 6;
+  string note = 7;
+  string provenance_bundle_id = 8;
+}
+
+// BenchmarkResult
+message BenchmarkResult {
+  string benchmark_id = 1;
+  string surrogate_model_revision_id = 2;
+  string benchmark_scenario = 3; // "S1" | "S2" | "S3" | "S4" | "S5"
+  string benchmark_date = 4;
+  string dataset_revision_id = 5;
+  map<string, MetricResult> in_distribution_metrics = 6;
+  map<string, MetricResult> ood_metrics = 7;
+  CalibrationResults calibration_results = 8;
+  RolloutStability rollout_stability = 9;
+  bool overall_pass = 10;
+  bool regression_detected = 11;
+  string decision_class_assignment = 12;
+  string benchmark_notes = 13;
+  string provenance_bundle_id = 14;
+}
+
+message MetricResult {
+  double value = 1;
+  double threshold = 2;
+  bool pass = 3;
+  string unit = 4;
+}
+
+message CalibrationResults {
+  double nominal_90 = 1;
+  double empirical_90 = 2;
+  bool pass_90 = 3;
+  double nominal_95 = 4;
+  double empirical_95 = 5;
+  bool pass_95 = 6;
+  double conditional_coverage_90 = 7;  // near-OOD stratum
+  bool recalibration_required = 8;
+}
+
+message RolloutStability {
+  bool tested = 1;
+  int32 horizon_steps = 2;
+  bool pass = 3;
+  int32 first_failure_step = 4;  // 0 if pass
+}

@@ -1,0 +1,117 @@
+syntax = "proto3";
+package henqo.schema.v1;
+import "primitives.proto";
+
+// ComponentRevision
+message ComponentRevision {
+  string entity_id = 1;
+  RevisionId revision_id = 2;
+  string component_name = 3;
+  string material_spec_id = 4;
+  map<string, double> design_variables = 5;
+  string status = 6;   // in_design | manufacturing_review_requested | manufacturing_reviewed | released | obsolete
+  string geometry_artifact_id = 7;
+  string created_at = 8;
+  string provenance_bundle_id = 9;
+}
+
+// AssemblyRevision
+message AssemblyRevision {
+  string entity_id = 1;
+  RevisionId revision_id = 2;
+  string assembly_name = 3;
+  repeated string child_component_revision_ids = 4;
+  string status = 5;   // in_design | manufacturing_review_requested | manufacturing_reviewed | released | obsolete
+  string program_id = 6;
+  string created_at = 7;
+  string provenance_bundle_id = 8;
+}
+
+// ProcessCapability
+message ProcessCapability {
+  string entity_id = 1;
+  RevisionId revision_id = 2;
+  string process_name = 3;
+  string characteristic_id = 4;
+  double cpk = 5;
+  double ppk = 6;
+  double sigma_process = 7;
+  int32 n_samples_used = 8;
+  string last_updated = 9;        // ISO 8601
+  string capability_class = 10;   // "capable" (≥1.33) | "marginal" (1.00-1.33) | "incapable" (<1.00)
+  bool stale = 11;                // true when last_updated > 12 months
+  string provenance_bundle_id = 12;
+}
+
+// DFMViolation
+message DFMViolation {
+  string entity_id = 1;
+  string rule_id = 2;             // e.g., "DFM-CNC-001"
+  string tier = 3;                // "A" | "B" | "C"
+  string component_revision_id = 4;
+  string feature_ref = 5;
+  double measured_value = 6;
+  double threshold_value = 7;
+  string unit = 8;
+  string violation_severity = 9;  // "HARD_BLOCKER" | "SOFT_WARNING" | "ADVISORY"
+  string disposition = 10;        // "open" | "waived" | "resolved" | "deferred"
+  string waiver_ref = 11;
+  string created_at = 12;
+  string provenance_bundle_id = 13;
+}
+
+// ToleranceStackContributor
+message ToleranceStackContributor {
+  string contributor_id = 1;
+  string characteristic_id = 2;
+  string dimension_name = 3;
+  Quantity nominal_value = 4;
+  Interval tolerance_interval = 5;
+  string distribution_family = 6;
+  double sigma_i = 7;
+  string cpk_ref = 8;
+  Quantity measurement_uncertainty = 9;
+  string measurement_uncertainty_source = 10;
+}
+
+// ToleranceStack
+message ToleranceStack {
+  string entity_id = 1;
+  string assembly_revision_id = 2;
+  string stack_name = 3;
+  string governing_requirement_id = 4;
+  string governing_characteristic_id = 5;
+  repeated ToleranceStackContributor contributors = 6;
+  // Correlation matrix (sparse — only non-zero entries)
+  repeated CorrelationEntry correlations = 7;
+  // Evaluation results
+  StackResult worst_case = 8;
+  StackResult rss = 9;
+  StackResult monte_carlo = 10;
+  string chosen_method = 11;
+  string chosen_method_rationale = 12;
+  // Decision rule
+  Quantity assembly_gap_lower = 13;
+  Quantity assembly_gap_upper = 14;
+  Quantity guard_band = 15;        // ISO 14253-1 expanded measurement uncertainty
+  string accept_result = 16;       // "accept" | "reject" | "conditional"
+  string provenance_bundle_id = 17;
+}
+
+message CorrelationEntry {
+  string contributor_i = 1;
+  string contributor_j = 2;
+  double rho_ij = 3;
+  string basis = 4;
+}
+
+message StackResult {
+  double result_value = 1;
+  string unit = 2;
+  double nominal_gap = 3;
+  double gap_at_result = 4;
+  string accept_result = 5;
+  int32 n_samples = 6;         // Monte Carlo only
+  int32 seed = 7;              // Monte Carlo only
+  double p99_gap = 8;          // Monte Carlo only
+}

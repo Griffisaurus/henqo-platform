@@ -1,0 +1,20 @@
+syntax = "proto3";
+package henqo.schema.v1;
+import "primitives.proto";
+
+message Characteristic {
+  string entity_id = 1;
+  RevisionId revision_id = 2;
+  string name = 3;
+  string quantity_kind = 4;      // e.g., "Force", "Length", "Dimensionless"
+  string unit = 5;
+  string governing_requirement_id = 6;
+  string criticality = 7;        // "critical" | "key" | "significant"
+  string decision_class_required = 8;
+  string status = 9;             // state machine: unverified → surrogate_estimated → simulation_validated → inspection_confirmed → released
+  repeated string evaluated_by = 10;  // Prediction entity IDs
+  string component_revision_id = 11;
+  string assembly_revision_id = 12;
+  string created_at = 13;
+  string provenance_bundle_id = 14;
+}

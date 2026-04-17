@@ -1,0 +1,32 @@
+syntax = "proto3";
+package henqo.schema.v1;
+import "primitives.proto";
+
+message SimulationCase {
+  string entity_id = 1;
+  RevisionId revision_id = 2;
+  string discipline = 3;         // "cfd" | "structural" | "thermal" | "electromagnetic"
+  string solver = 4;             // "openfoam" | "fenics" | "lammps" | "ngspice"
+  string solver_version = 5;
+  string component_revision_id = 6;
+  string assembly_revision_id = 7;
+  string input_file_hash = 8;
+  map<string, double> boundary_conditions = 9;
+  double convergence_threshold = 10;
+  repeated string target_characteristic_ids = 11;
+  string status = 12;            // queued | running | completed | failed | validated | invalidated
+  map<string, double> results = 13;
+  map<string, string> result_units = 14;
+  double solver_residuals = 15;
+  repeated string solver_warning_flags = 16;
+  string results_artifact_id = 17;
+  string error_message = 18;
+  string job_id = 19;
+  string idempotency_key = 20;
+  // Provenance fields (required for validation per data-governance-provenance-spec.md §5 Rule L5)
+  string solver_binary_version = 21;
+  string computational_environment = 22;
+  int32 wall_clock_runtime_seconds = 23;
+  string created_at = 24;
+  string provenance_bundle_id = 25;
+}

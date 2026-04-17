@@ -1,0 +1,96 @@
+syntax = "proto3";
+package henqo.schema.v1;
+option py_generic_services = false;
+
+// Id — opaque string identifier, UUIDv4 lowercase-hyphenated
+message Id {
+  string value = 1;
+}
+
+// RevisionId — content-addressed SHA-256 hex digest
+message RevisionId {
+  string sha256 = 1;
+}
+
+// Quantity — a numerical value with unit and canonical SI conversion
+message Quantity {
+  double value = 1;
+  string unit = 2;               // QUDT/pint parseable unit string
+  double canonical_si_value = 3; // computed by unit-conversion-service
+  string canonical_si_unit = 4;
+}
+
+// Interval — closed interval [lower, upper] with shared unit
+message Interval {
+  double lower = 1;
+  double upper = 2;
+  string unit = 3;
+}
+
+// Distribution — parameterized probability distribution
+message Distribution {
+  string family = 1;             // "normal", "lognormal", "uniform", "triangular"
+  double mean = 2;
+  double std_dev = 3;
+  double lower_bound = 4;        // for bounded distributions
+  double upper_bound = 5;
+  string unit = 6;
+}
+
+// Frame — coordinate frame reference
+message Frame {
+  string frame_id = 1;
+  string parent_frame_id = 2;    // null for root frame
+  string description = 3;
+}
+
+// Digest — content-addressed hash
+message Digest {
+  string algorithm = 1;          // "sha256"
+  string hex = 2;
+}
+
+// ArtifactRef — reference to an artifact in artifact-service
+message ArtifactRef {
+  string artifact_id = 1;
+  Digest digest = 2;
+  string artifact_type = 3;      // see ArtifactType enum
+  string storage_uri = 4;
+}
+
+// Money — monetary amount (for cost estimation)
+message Money {
+  int64 amount_micros = 1;       // amount * 1,000,000 to avoid floating point
+  string currency_code = 3;      // ISO 4217, e.g. "USD"
+}
+
+// FloatRange — simple float bounds (used in OodRegion)
+message FloatRange {
+  float lower = 1;
+  float upper = 2;
+}
+
+// ArtifactType enum
+enum ArtifactType {
+  ARTIFACT_TYPE_UNSPECIFIED = 0;
+  ARTIFACT_TYPE_AP242 = 1;
+  ARTIFACT_TYPE_NATIVE_CAD = 2;
+  ARTIFACT_TYPE_QIF_PLAN = 3;
+  ARTIFACT_TYPE_QIF_RESULT = 4;
+  ARTIFACT_TYPE_HDF5_FIELD = 5;
+  ARTIFACT_TYPE_BOM_JSON = 6;
+  ARTIFACT_TYPE_BOM_EBOM = 7;
+  ARTIFACT_TYPE_BOM_MBOM = 8;
+  ARTIFACT_TYPE_NC_CODE = 9;
+  ARTIFACT_TYPE_PROCESS_PLAN = 10;
+  ARTIFACT_TYPE_WORK_INSTRUCTION = 11;
+  ARTIFACT_TYPE_TEST_REPORT = 12;
+  ARTIFACT_TYPE_INSPECTION_REPORT = 13;
+  ARTIFACT_TYPE_RELEASE_LETTER = 14;
+  ARTIFACT_TYPE_PARQUET = 15;
+  // Model lifecycle (added v0.1.0)
+  ARTIFACT_TYPE_MODEL_WEIGHTS = 100;
+  ARTIFACT_TYPE_ORCHESTRATOR_WEIGHTS = 101;
+  ARTIFACT_TYPE_TRAINING_SPLIT = 102;
+  ARTIFACT_TYPE_SCALER = 103;
+}

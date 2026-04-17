@@ -1,0 +1,20 @@
+syntax = "proto3";
+package henqo.schema.v1;
+import "primitives.proto";
+
+message Requirement {
+  string entity_id = 1;
+  RevisionId revision_id = 2;
+  string text = 3;
+  Quantity quantity = 4;
+  string direction = 5;          // "lower_bound" | "upper_bound" | "range" | "qualitative"
+  Quantity lower_bound = 6;      // for direction="range"
+  Quantity upper_bound = 7;      // for direction="range"
+  string condition = 8;
+  string criticality = 9;        // "critical" | "key" | "significant" | "informational"
+  string decision_class_required = 10; // "Exploratory" | "DesignGate" | "ReleaseCritical" | "SafetyCritical"
+  string source_document = 11;
+  string program_id = 12;
+  string created_at = 13;
+  string provenance_bundle_id = 14;
+}

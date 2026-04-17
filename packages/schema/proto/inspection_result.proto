@@ -1,0 +1,22 @@
+syntax = "proto3";
+package henqo.schema.v1;
+import "primitives.proto";
+
+message InspectionResult {
+  string entity_id = 1;
+  RevisionId revision_id = 2;
+  string characteristic_id = 3;
+  string component_revision_id = 4;
+  Quantity measured_value = 5;
+  string decision_rule = 6;      // e.g., "ISO 14253-1 guard band"
+  Quantity measurement_uncertainty = 7;
+  string uncertainty_source = 8; // "GUM" | "calibration_cert"
+  string equipment_id = 9;
+  string calibration_status = 10;
+  string calibration_date = 11;
+  string datum_reference_frame = 12;
+  string operator_id = 13;
+  string decision = 14;          // "accept" | "reject" | "conditional"
+  string measured_at = 15;
+  string provenance_bundle_id = 16;
+}

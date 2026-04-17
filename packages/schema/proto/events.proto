@@ -1,0 +1,64 @@
+syntax = "proto3";
+package henqo.schema.v1;
+
+// IrEvent — all state transitions and significant actions emit typed events
+// Delivered via Redis Streams (v0) or NATS/Kafka (v1+)
+message IrEvent {
+  string event_id = 1;           // UUIDv4
+  string event_type = 2;         // canonical type string, e.g. "prediction.created"
+  string entity_type = 3;
+  string entity_id = 4;
+  string previous_state = 5;
+  string new_state = 6;
+  string triggered_by = 7;       // agent or service ID
+  string timestamp = 8;          // ISO 8601 UTC
+  string schema_version = 9;
+  bytes payload = 10;            // proto-encoded entity snapshot
+}
+
+// Canonical event types (v0.1.0)
+// Keep this list in sync with canonical-schema-spec.md §10
+//
+// Core entity events:
+//   requirement.created
+//   characteristic.created
+//   characteristic.status_changed
+//   prediction.created
+//   prediction.blocked
+//   surrogate.abstained
+//   simulation_case.queued
+//   simulation_case.completed
+//   simulation_case.failed
+//   simulation_case.validated
+//   dfm_violation.created
+//   dfm_violation.class_a_found
+//   release_manifest.pending_signatures
+//   release_manifest.active
+//   release_manifest.evidence_incomplete
+//
+// Model lifecycle events:
+//   model.frozen
+//   model.promoted
+//   model.deprecated
+//   serving.latency_degraded
+//   serving.model_unavailable
+//
+// Orchestrator events:
+//   orchestrator.session_started
+//   orchestrator.session_ended
+//   agent.malformed_tool_call
+//   agent.loop_stalled
+//
+// Active learning events:
+//   active_learning.campaign_ready
+//   active_learning.campaign_partial_failure
+//   active_learning.data_consistency_failure
+//   active_learning.retraining_triggered
+//   campaign.ineffective
+//
+// Escalation events:
+//   surrogate.abstained          (also a core entity event)
+//   simulation.repeatedly_failed
+//   process_capability.stale_blocking_release
+//   characteristic.released_error_detected
+//   data.stale_detected

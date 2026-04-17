@@ -1,0 +1,77 @@
+syntax = "proto3";
+package henqo.schema.v1;
+import "primitives.proto";
+
+message TrustBundle {
+  // Model identity
+  string model_revision_id = 1;
+  string training_dataset_revision = 2;
+  string calibration_dataset_ref = 3;
+  string weight_hash = 4;            // SHA-256 of weight file
+
+  // Domain validity
+  float applicability_score = 5;     // A(x) = 0.30·a_density + 0.30·a_range + 0.40·a_ensemble
+  float ood_score = 6;               // 1 - applicability_score
+  float a_density = 7;
+  float a_range = 8;
+  float a_ensemble = 9;
+  repeated string domain_tags = 10;
+
+  // Uncertainty envelope
+  UncertaintyEnvelope uncertainty = 11;
+
+  // Decision margin
+  Quantity decision_margin = 12;
+  float interval_to_margin_ratio = 13; // W_95 / M
+
+  // Benchmark traceability
+  repeated string benchmark_result_ids = 14;
+  string last_benchmark_date = 15;
+  repeated string benchmark_scenarios_passed = 16;
+
+  // Spot-check history
+  string spot_check_log_ref = 17;
+  float spot_check_disagreement_rate = 18;
+  int32 spot_check_count = 19;
+
+  // Policy disposition
+  string evaluated_decision_class = 20; // Exploratory | DesignGate | ReleaseCritical | SafetyCritical | Blocked
+  bool auto_accept = 21;
+  bool requires_simulation_confirmation = 22;
+  bool human_review_required = 23;
+  bool abstain = 24;
+
+  // Rollout stability
+  string rollout_stability_flag = 25; // "stable" | "unstable_beyond_N_steps"
+  int32 rollout_stable_horizon = 26;
+
+  // Provenance
+  string policy_version = 27;
+  string evaluated_at = 28;
+  string evaluated_by_agent = 29;
+}
+
+message UncertaintyEnvelope {
+  string family = 1;             // "deep_ensemble_conformal"
+  int32 n_ensemble_members = 2;  // must be ≥ 5
+  map<string, double> interval_90_lower = 3;   // output_name → value
+  map<string, double> interval_90_upper = 4;
+  map<string, double> interval_95_lower = 5;
+  map<string, double> interval_95_upper = 6;
+  map<string, double> interval_95_width = 7;
+  map<string, double> ensemble_std_dev = 8;
+  string unit = 9;
+}
+
+message Prediction {
+  string entity_id = 1;
+  RevisionId revision_id = 2;
+  string governing_characteristic_id = 3;
+  string surrogate_family = 4;
+  map<string, double> outputs = 5;           // output_name → value
+  map<string, string> output_units = 6;
+  TrustBundle trust_bundle = 7;
+  string status = 8;             // created | blocked | used | superseded | abstained
+  string created_at = 9;
+  string provenance_bundle_id = 10;
+}

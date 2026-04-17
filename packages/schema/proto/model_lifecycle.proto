@@ -1,0 +1,119 @@
+syntax = "proto3";
+package henqo.schema.v1;
+import "primitives.proto";
+
+// SurrogateModel — permanent registry entry for a trained surrogate
+message SurrogateModel {
+  string model_id = 1;
+  RevisionId revision_id = 2;
+  string surrogate_family = 3;       // S1 | S2 | S3 | S4 | S5
+  string model_name = 4;
+  string architecture = 5;
+  string framework = 6;
+  string weight_artifact_id = 7;
+  string weight_hash = 8;
+  string weight_format = 9;          // "safetensors" | "onnx"
+  int64 weight_size_bytes = 10;
+  string training_job_id = 11;
+  string training_dataset_revision = 12;
+  string calibration_dataset_revision = 13;
+  string training_schema_version = 14;
+  string training_commit_sha = 15;
+  map<string, string> hyperparameters = 16;
+  repeated string benchmark_result_ids = 17;
+  string last_benchmark_date = 18;
+  repeated string benchmark_scenarios_passed = 19;
+  ModelStatus status = 20;
+  string promoted_at = 21;
+  string promoted_by = 22;
+  string deprecated_at = 23;
+  string deprecation_reason = 24;
+  repeated FeatureSpec input_features = 25;
+  repeated FeatureSpec output_features = 26;
+  float p95_latency_ms_target = 27;
+  string provenance_bundle_id = 28;
+  string created_at = 29;
+}
+
+message FeatureSpec {
+  string name = 1;
+  string quantity_kind = 2;
+  string unit = 3;
+  float valid_range_lower = 4;
+  float valid_range_upper = 5;
+  bool required = 6;
+  string description = 7;
+}
+
+enum ModelStatus {
+  MODEL_STATUS_UNSPECIFIED = 0;
+  MODEL_STATUS_TRAINING = 1;
+  MODEL_STATUS_BENCHMARKING = 2;
+  MODEL_STATUS_STAGED = 3;
+  MODEL_STATUS_PRODUCTION = 4;
+  MODEL_STATUS_DEPRECATED = 5;
+  MODEL_STATUS_RETIRED = 6;
+}
+
+// TrainingJob — tracks a single surrogate training run
+message TrainingJob {
+  string job_id = 1;
+  string surrogate_family = 2;
+  string architecture = 3;
+  string training_dataset_revision = 4;
+  string calibration_dataset_revision = 5;
+  map<string, string> hyperparameters = 6;
+  string training_script_commit_sha = 7;
+  string framework_version = 8;
+  TrainingJobState state = 9;
+  int32 current_epoch = 10;
+  float train_loss = 11;
+  float val_loss = 12;
+  string checkpoint_artifact_id = 13;
+  string result_model_id = 14;
+  string error_message = 15;
+  bool use_local_gpu = 16;
+  string cloud_instance_type = 17;
+  int32 max_wall_hours = 18;
+  string provenance_bundle_id = 19;
+  string started_at = 20;
+  string completed_at = 21;
+}
+
+enum TrainingJobState {
+  TRAINING_JOB_UNSPECIFIED = 0;
+  TRAINING_JOB_QUEUED = 1;
+  TRAINING_JOB_RUNNING = 2;
+  TRAINING_JOB_COMPLETED = 3;
+  TRAINING_JOB_FAILED = 4;
+  TRAINING_JOB_CANCELLED = 5;
+}
+
+// OrchestratorSession — audit record for one LLM orchestrator session
+message OrchestratorSession {
+  string session_id = 1;
+  string role = 2;               // SE | DE | SA | MA | ER
+  string orchestrator_model_id = 3;
+  string policy_version = 4;
+  string assembly_revision_id = 5;
+  repeated SessionToolCall tool_calls = 6;
+  repeated string entities_modified = 7;
+  repeated StateTransitionRecord state_transitions = 8;
+  string session_started_at = 9;
+  string session_ended_at = 10;
+  string provenance_bundle_id = 11;
+}
+
+message SessionToolCall {
+  int32 call_n = 1;
+  string tool_name = 2;
+  string idempotency_key = 3;
+  int32 latency_ms = 4;
+  string result_summary = 5;
+}
+
+message StateTransitionRecord {
+  string entity_id = 1;
+  string from_state = 2;
+  string to_state = 3;
+}
